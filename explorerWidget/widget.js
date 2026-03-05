@@ -27,6 +27,7 @@ async function init() {
   document.getElementById('stats').textContent =
     `${commData.results.length} communities · ${domData.results.length} domains`;
   renderTree(roots);
+  preloadAllCounts(Object.values(commMap));
 
   document.getElementById('search').addEventListener('input', e => {
     const q = e.target.value.toLowerCase();
@@ -117,6 +118,10 @@ async function loadCounts(community) {
 
   load('communityId', community.id, 'community-id');
   community.domains.forEach(d => load('domainId', d.id, 'domain-id'));
+}
+
+function preloadAllCounts(communities) {
+  communities.forEach(c => loadCounts(c));
 }
 
 const esc = s => s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]);
