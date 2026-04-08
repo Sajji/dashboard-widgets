@@ -129,27 +129,4 @@ Then in `tree.html`:
 
 ---
 
-## JavaScript API
 
-The `NavTree` module is exposed as a global on the page. You can call its methods from your own scripts.
-
-```js
-// Render the tree inside the element with id="nav-tree-root"
-NavTree.init('nav-tree-root');
-
-// Toggle expand-all / collapse-all (same as the button)
-NavTree.toggleTree();
-
-// Filter rows to those whose name contains the query string.
-// Pass an empty string to clear the filter.
-NavTree.applySearch('logistics');
-```
-
----
-
-## Notes
-
-- The widget authenticates using the active Collibra browser session. No credentials are stored or hardcoded.
-- The CSRF token is fetched automatically from `/rest/2.0/auth/sessions/current` before any write-capable request.
-- Community links open in a new tab pointing to `{baseURL}/community/{UUID}`.
-- The widget has no external dependencies and makes no requests to the public internet.
