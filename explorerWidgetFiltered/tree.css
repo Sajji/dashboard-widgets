@@ -1,0 +1,308 @@
+/*
+ * tree.css — Navigator Community Tree
+ * ====================================
+ * Structural stylesheet only. No brand colours, no imagery,
+ * no web-font dependencies. All fonts resolve from the
+ * operating system — no network request is made.
+ *
+ * HOW TO THEME
+ * ------------
+ * Every visual value is a custom property in :root.
+ * Create your own stylesheet, override the properties you
+ * want, and link it after this file. You never need to edit
+ * this file directly.
+ *
+ *   Example override file:
+ *
+ *     :root {
+ *       --tree-text:        #ffffff;
+ *       --tree-hover:       rgba(255,255,255,0.06);
+ *       --tree-guide:       rgba(255,255,255,0.10);
+ *       --tree-font:        'Your Brand Font', system-ui, sans-serif;
+ *     }
+ */
+
+
+/* ─── Custom properties ──────────────────────────────────────────────────── */
+:root {
+  /*
+   * TYPOGRAPHY
+   * Uses the operating-system UI font on every platform:
+   *   macOS / iOS  → San Francisco
+   *   Windows      → Segoe UI
+   *   Android      → Roboto
+   *   Linux        → the distro default (often Noto or DejaVu)
+   * No font file is fetched from the internet.
+   */
+  --tree-font:          system-ui, -apple-system, BlinkMacSystemFont,
+                        'Segoe UI', sans-serif;
+  --tree-font-mono:     ui-monospace, 'Cascadia Code', Consolas,
+                        'Courier New', monospace;
+  --tree-font-size:     13px;
+  --tree-font-size-sm:  11px;
+  --tree-line-height:   1.5;
+
+  /*
+   * COLOUR
+   * All values are intentionally neutral. Replace them in your
+   * override file to match your brand.
+   */
+  --tree-text:          currentColor;   /* inherits from host page */
+  --tree-text-muted:    rgba(0,0,0,0.40);
+  --tree-hover:         rgba(0,0,0,0.04);
+  --tree-active:        rgba(0,0,0,0.07);
+  --tree-guide:         rgba(0,0,0,0.10);
+  --tree-error:         #c0392b;
+
+  /*
+   * SPACING & SIZING
+   */
+  --tree-indent:        20px;   /* horizontal indent added per depth level  */
+  --tree-pad-x:         10px;   /* left padding of the root row              */
+  --tree-row-height:    28px;   /* minimum row height                        */
+  --tree-chevron-size:  16px;   /* width and height of the chevron cell      */
+
+  /*
+   * ANIMATION
+   * Set both to 0s to disable all motion.
+   */
+  --tree-duration:      0.18s;
+  --tree-easing:        ease;
+}
+
+
+/* ─── Scoped reset ───────────────────────────────────────────────────────── */
+/*
+ * Applied only inside .nav-tree so nothing leaks into the host page.
+ */
+.nav-tree *,
+.nav-tree *::before,
+.nav-tree *::after {
+  box-sizing: border-box;
+  margin:     0;
+  padding:    0;
+}
+
+
+/* ─── Container ──────────────────────────────────────────────────────────── */
+.nav-tree {
+  font-family: var(--tree-font);
+  font-size:   var(--tree-font-size);
+  line-height: var(--tree-line-height);
+  color:       var(--tree-text);
+  background:  transparent;
+}
+
+
+/* ─── Toolbar ────────────────────────────────────────────────────────────── */
+.nav-tree__toolbar {
+  display:     flex;
+  align-items: center;
+  gap:         6px;
+  padding:     0 0 8px 0;
+}
+
+
+/* ─── Button ─────────────────────────────────────────────────────────────── */
+/*
+ * Inherits font from the container — no separate font-family needed.
+ * The border and colours are intentionally minimal so the button
+ * adopts whatever the host page considers "normal".
+ */
+.nav-tree__btn {
+  font-family:  inherit;
+  font-size:    var(--tree-font-size-sm);
+  line-height:  1;
+  padding:      5px 12px;
+  background:   transparent;
+  color:        inherit;
+  border:       1px solid currentColor;
+  border-radius: 3px;
+  opacity:      0.60;
+  cursor:       pointer;
+  transition:   opacity var(--tree-duration);
+  white-space:  nowrap;
+}
+
+.nav-tree__btn:hover   { opacity: 1; }
+.nav-tree__btn:disabled { opacity: 0.25; cursor: default; }
+
+
+/* ─── Tree body ──────────────────────────────────────────────────────────── */
+/*
+ * No overflow set — the host page decides whether to clip or scroll.
+ */
+.nav-tree__body {}
+
+
+/* ─── Node wrapper ───────────────────────────────────────────────────────── */
+.nav-tree__node {
+  animation: nav-tree-in var(--tree-duration) var(--tree-easing) both;
+}
+
+@keyframes nav-tree-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+
+/* ─── Row ────────────────────────────────────────────────────────────────── */
+/*
+ * padding-left is set inline by JavaScript to achieve per-depth
+ * indentation (base + depth × --tree-indent).
+ */
+.nav-tree__row {
+  display:      flex;
+  align-items:  center;
+  min-height:   var(--tree-row-height);
+  padding-top:    2px;
+  padding-bottom: 2px;
+  padding-right: var(--tree-pad-x);
+  cursor:       pointer;
+  user-select:  none;
+  border-radius: 3px;
+  transition:   background var(--tree-duration);
+}
+
+.nav-tree__row:hover  { background: var(--tree-hover); }
+.nav-tree__row.active { background: var(--tree-active); }
+
+
+/* ─── Chevron ────────────────────────────────────────────────────────────── */
+/*
+ * The ▶ character is rendered as text inside the span.
+ * Rotation to ▼ is handled by adding .open via JavaScript.
+ */
+.nav-tree__chevron {
+  width:        var(--tree-chevron-size);
+  height:       var(--tree-chevron-size);
+  flex-shrink:  0;
+  display:      grid;
+  place-items:  center;
+  font-size:    8px;
+  margin-right: 3px;
+  opacity:      0.45;
+  transition:   opacity var(--tree-duration),
+                transform var(--tree-duration) var(--tree-easing);
+}
+
+.nav-tree__row:hover .nav-tree__chevron { opacity: 0.80; }
+
+.nav-tree__chevron.open {
+  transform: rotate(90deg);
+  opacity:   0.70;
+}
+
+/*
+ * Empty spacer — same dimensions as the chevron — used when a node
+ * has no children, to keep names horizontally aligned.
+ */
+.nav-tree__chevron-gap {
+  width:        var(--tree-chevron-size);
+  flex-shrink:  0;
+  margin-right: 3px;
+}
+
+
+/* ─── Name ───────────────────────────────────────────────────────────────── */
+.nav-tree__name {
+  flex:           1;
+  overflow:       hidden;
+  white-space:    nowrap;
+  text-overflow:  ellipsis;
+}
+
+.nav-tree__name a {
+  color:           inherit;
+  text-decoration: none;
+}
+
+.nav-tree__name a:hover {
+  text-decoration: underline;
+}
+
+
+/* ─── Children wrapper ───────────────────────────────────────────────────── */
+/*
+ * CSS grid row-sizing trick for smooth height animation.
+ *
+ *   Closed → grid-template-rows: 0fr  (zero height, content clipped)
+ *   Open   → grid-template-rows: 1fr  (natural height)
+ *
+ * The inner div (nav-tree__children-inner) must have overflow:hidden
+ * so content is clipped during the transition.
+ *
+ * margin-left is set inline by JavaScript so the vertical guide line
+ * aligns under the centre of the parent chevron.
+ */
+.nav-tree__children {
+  display:            grid;
+  grid-template-rows: 0fr;
+  transition:         grid-template-rows var(--tree-duration) var(--tree-easing);
+  border-left:        1px solid var(--tree-guide);
+}
+
+.nav-tree__children.open {
+  grid-template-rows: 1fr;
+}
+
+.nav-tree__children-inner {
+  overflow: hidden;
+}
+
+
+/* ─── Inline loading row ─────────────────────────────────────────────────── */
+.nav-tree__loading-row {
+  display:     flex;
+  align-items: center;
+  gap:         7px;
+  padding:     5px 10px;
+  font-family: var(--tree-font-mono);
+  font-size:   var(--tree-font-size-sm);
+  opacity:     0.45;
+}
+
+.nav-tree__spinner {
+  width:         11px;
+  height:        11px;
+  flex-shrink:   0;
+  border:        1.5px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  opacity:       0.60;
+  animation:     nav-tree-spin 0.7s linear infinite;
+}
+
+@keyframes nav-tree-spin {
+  to { transform: rotate(360deg); }
+}
+
+
+/* ─── Error ──────────────────────────────────────────────────────────────── */
+.nav-tree__error {
+  padding:     10px 12px;
+  font-size:   var(--tree-font-size-sm);
+  color:       var(--tree-error);
+  line-height: 1.5;
+  opacity:     0.85;
+}
+
+
+/* ─── Empty state ────────────────────────────────────────────────────────── */
+.nav-tree__empty {
+  padding:    20px 10px;
+  font-size:  var(--tree-font-size-sm);
+  text-align: center;
+  opacity:    0.45;
+}
+
+
+/* ─── Search states ──────────────────────────────────────────────────────── */
+/*
+ * Applied by NavTree.applySearch(query).
+ * .search-hidden hides non-matching rows.
+ * .search-match bolds the name of matching rows.
+ */
+.nav-tree__row.search-hidden   { display: none; }
+.nav-tree__row.search-match
+  .nav-tree__name a             { font-weight: 600; }

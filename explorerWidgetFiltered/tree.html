@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Navigate the Army Data Communities</title>
+
+  <!--
+    ┌─────────────────────────────────────────────────────────────┐
+    │  STYLING                                                    │
+    │  All design tokens (colours, fonts, spacing, animation)    │
+    │  live in tree.css under the :root { } block.               │
+    │  That is the only file you need to edit to retheme this    │
+    │  widget.                                                    │
+    └─────────────────────────────────────────────────────────────┘
+  -->
+  <link rel="stylesheet" href="tree.css">
+
+  <!--
+    Optional: add your own stylesheet here to override tokens
+    or add page-level styles without modifying tree.css.
+
+    Example:
+    <link rel="stylesheet" href="my-theme.css">
+  -->
+</head>
+<body>
+
+  <!--
+    ┌─────────────────────────────────────────────────────────────┐
+    │  WIDGET MOUNT POINT                                         │
+    │                                                             │
+    │  The tree is rendered inside this element.                 │
+    │  You can place it anywhere on the page, nest it inside a   │
+    │  layout container, or give it a specific width / height.   │
+    │                                                             │
+    │  The id value must match the argument passed to            │
+    │  NavTree.init() at the bottom of this file.                │
+    └─────────────────────────────────────────────────────────────┘
+  -->
+  <div id="nav-tree-root"></div>
+
+
+  <!--
+    ┌─────────────────────────────────────────────────────────────┐
+    │  OPTIONAL: HOST-PAGE SEARCH INPUT                          │
+    │                                                             │
+    │  If you want a search / filter field, add your own input   │
+    │  element anywhere on the page and wire it to               │
+    │  NavTree.applySearch(value) as shown below.                │
+    │  The JavaScript module handles the rest.                   │
+    │                                                             │
+    │  Uncomment to enable:                                       │
+    │                                                             │
+    │  <input id="community-search"                              │
+    │         type="search"                                       │
+    │         placeholder="Filter communities…">                 │
+    └─────────────────────────────────────────────────────────────┘
+  -->
+
+
+  <script src="tree.js"></script>
+  <script>
+    // ── Initialise the tree ───────────────────────────────────────────────────
+    // Pass the id of the mount-point element defined above.
+    NavTree.init('nav-tree-root');
+
+
+    // ── Optional: wire up a search input ────────────────────────────────────
+    // Uncomment if you added a search input above.
+    //
+    // document.getElementById('community-search')
+    //   .addEventListener('input', e => NavTree.applySearch(e.target.value));
+
+
+    // ── Optional: call NavTree methods from your own code ───────────────────
+    //
+    //   NavTree.toggleTree()   — expand full tree / collapse full tree (toggles)
+    //   NavTree.applySearch(q) — filter rows; pass '' to clear
+  </script>
+
+</body>
+</html>
