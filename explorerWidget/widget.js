@@ -1,23 +1,60 @@
 const baseURL = `${location.protocol}//${location.host}`;
-const api = path => fetch(`${baseURL}/rest/2.0${path}`).then(r => r.json());
+const api = path => fetch(`${baseURL}/rest/2.0${path}`, { credentials: 'include' }).then(r => r.json());
 const countCache = {};
 
+const NAVIGATOR_QUERY = `
+  query NavigatorCommunities {
+    communities(
+      where: { responsibilities: { any: { role: { name: { eq: "Navigator" } } } } }
+    ) {
+      id
+      name
+      parent { id name }
+      subCommunities { id }
+    }
+  }
+`;
+
+async function gql(query, csrf) {
+  const res = await fetch(`${baseURL}/graphql/knowledgeGraph/v1`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': csrf,
+    },
+    body: JSON.stringify({ query }),
+  });
+  if (!res.ok) throw new Error(`GraphQL HTTP ${res.status}`);
+  const json = await res.json();
+  if (json.errors && json.errors.length) throw new Error(json.errors[0].message);
+  return json.data;
+}
+
 async function init() {
-  const [commData, domData] = await Promise.all([
-    api('/communities?offset=0&limit=1000&excludeMeta=true&sortField=NAME&sortOrder=ASC'),
+  const csrfRes = await fetch(
+    `${baseURL}/rest/2.0/auth/sessions/current?include=csrfToken`,
+    { credentials: 'include' }
+  );
+  const csrf = (await csrfRes.json()).csrfToken;
+
+  const [gqlData, domData] = await Promise.all([
+    gql(NAVIGATOR_QUERY, csrf),
     api('/domains?offset=0&limit=1000&excludeMeta=true&sortField=NAME&sortOrder=ASC')
   ]);
 
+  const navCommunities = gqlData.communities || [];
+
   const commMap = {};
-  commData.results.forEach(c => commMap[c.id] = { ...c, children: [], domains: [] });
+  navCommunities.forEach(c => commMap[c.id] = { ...c, children: [], domains: [] });
   domData.results.forEach(d => {
     if (d.community && commMap[d.community.id]) commMap[d.community.id].domains.push(d);
   });
 
   const roots = [];
-  Object.values(commMap).forEach(c => {
+  navCommunities.forEach(c => {
     const pid = c.parent?.id;
-    (pid && commMap[pid]) ? commMap[pid].children.push(c) : roots.push(c);
+    (pid && commMap[pid]) ? commMap[pid].children.push(commMap[c.id]) : roots.push(commMap[c.id]);
   });
 
   const sort = a => a.sort((x, y) => x.name.localeCompare(y.name));
@@ -25,7 +62,7 @@ async function init() {
   sort(roots);
 
   document.getElementById('stats').textContent =
-    `${commData.results.length} communities · ${domData.results.length} domains`;
+    `${navCommunities.length} communities · ${domData.results.length} domains`;
   renderTree(roots);
   preloadAllCounts(Object.values(commMap));
 
