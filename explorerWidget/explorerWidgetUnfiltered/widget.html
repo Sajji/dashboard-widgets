@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="widget.css">
+</head>
+<body>
+  <div class="widget">
+    <div class="header">
+      <div class="title">Communities &amp; Domains</div>
+      <div class="stats" id="stats"></div>
+    </div>
+    <div class="search-bar">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" id="search" placeholder="Filter communities and domains…">
+    </div>
+    <div class="tree" id="tree">
+      <div class="loading">Loading…</div>
+    </div>
+  </div>
+  <script src="widget.js"></script>
+</body>
+</html>
